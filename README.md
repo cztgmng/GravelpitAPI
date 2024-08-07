@@ -37,6 +37,10 @@ To get started with the Gravel Pit Server API, follow these steps:
 
    Open the solution file (`GravelpitAPI.sln`) in Visual Studio
 
+5. **Set up SQL Databse**
+
+   The gravel pit database structure is inside "gravelpit db.sql" file. Import it into your database. It contains all required tables with prepared relations.
+
 ## Endpoints
 
 The API provides the following endpoints:
