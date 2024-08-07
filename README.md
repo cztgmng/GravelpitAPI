@@ -3,7 +3,7 @@
 Welcome to the Gravel Pit Server API project! This API provides functionalities for managing clients, orders, and types in a gravel pit system. The project was developed using Visual Studio.
 I mainly created it for my family business and it's doing well. 
 
-It's tightly connected with Gravelpit client from my other repository.
+It's tightly connected with [Gravelpit client](https://github.com/cztgmng/GravelPitClient) from my other repository.
 
 ## Table of Contents
 
