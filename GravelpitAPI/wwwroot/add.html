@@ -1,0 +1,353 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add</title>
+
+    <style>
+
+        h2 {
+            margin: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #272727;
+            padding: 20px;
+            padding-top: 0px;
+            color: white;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 80%;
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        input[type="date"] {
+            width: 79.2%;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #button3,
+        #button2 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #button3 {
+            float: right;
+            margin-right: 19%;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        input[type="number"] {
+            width: 80%; /* Match the width with the select element */
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+            .btn:hover {
+                background-color: #2980b9;
+            }
+    </style>
+
+</head>
+<body style="background-color: #272727;">
+    <div class="container">
+        <h2>Add</h2>
+
+        <div id="ES">
+            <select id="clienttext">
+                <option disabled selected value> -- select an option -- </option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div id="ES2">
+            <label for="comboBox2">Type</label>
+            <select id="comboBox2">
+                <option value="Piasek_0-2mm">Piasek 0-2mm</option>
+                <option value="Żwir_2-8mm">Żwir 2-8mm</option>
+                <option value="Żwir_8-16mm">Żwir 8-16mm</option>
+                <option value="Pospółka">Pospółka</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <br>
+        <label for="textBox1">Amount (t)</label>
+        <input type="number" step=0.01 id="textBox1">
+        <br>
+        <label for="datePicker">Select a Date</label>
+        <input type="date" id="datePicker">
+        <br>
+        <button id="button2">Confirm</button>
+        <button id="button3">Send</button>
+        <br>
+        <div id="flowLayoutPanel1">
+        </div>
+    </div>
+
+    <script>
+
+        const textBox = document.getElementById("textBox1");
+
+        textBox.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                document.getElementById("button2").click();
+            }
+        });
+
+        var datePicker = document.getElementById('datePicker');
+
+        // Get today's date in the format "YYYY-MM-DD"
+        var today = new Date().toISOString().split('T')[0];
+
+        // Set the maximum date attribute to today
+        datePicker.setAttribute('max', today);
+
+        // Set the input value to today
+        datePicker.value = today;
+
+
+        const clientSelect = document.getElementById("clienttext");
+        const comboBox2Select = document.getElementById("comboBox2");
+
+        // Handle clienttext select change
+        clientSelect.addEventListener("change", () => {
+            if (clientSelect.value === "other") {
+                // Display an input field for the custom value
+                const customValueInput = document.createElement("input");
+                customValueInput.type = "text";
+                customValueInput.id = "customValueInput"; // You can give it a unique ID
+                customValueInput.placeholder = "Enter custom value";
+                // Append the input field to the container (or where you want to display it)
+                document.getElementById("ES").appendChild(customValueInput);
+            } else {
+                // If an option other than "Other" is selected, hide or remove the input field
+                const customValueInput = document.getElementById("customValueInput");
+                if (customValueInput) {
+                    customValueInput.remove();
+                }
+            }
+            clientSelect.disabled = true;
+        });
+
+        // Handle clienttext select change
+        comboBox2Select.addEventListener("change", () => {
+            if (comboBox2Select.value === "other") {
+                // Display an input field for the custom value
+                const customValueInput = document.createElement("input");
+                customValueInput.type = "text";
+                customValueInput.id = "customValueInput2"; // You can give it a unique ID
+                customValueInput.placeholder = "Enter custom value";
+                // Append the input field to the container (or where you want to display it)
+                document.getElementById("ES2").appendChild(customValueInput);
+            } else {
+                // If an option other than "Other" is selected, hide or remove the input field
+                const customValueInput = document.getElementById("customValueInput2");
+                if (customValueInput) {
+                    customValueInput.remove();
+                }
+            }
+        });
+
+
+
+        const selectElement = document.getElementById("clienttext");
+        // Make a fetch request to get the JSON response from the server
+        fetch("/api/GetClients")
+            .then(response => response.json())
+            .then(jsonResponse => {
+                jsonResponse.forEach(clientName => {
+                    const option = document.createElement("option");
+                    option.value = clientName;
+                    option.text = clientName;
+                    //option.selected = true;
+                    selectElement.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching data:", error));
+
+
+        let id = 0;
+
+        document.getElementById('button2').addEventListener('click', () =>
+        {
+
+            if (document.getElementById("textBox1").value == "") {
+                alert("Podaj ilosc");
+                return;
+            }
+
+            let client = "";
+            if (clientSelect.value === "other") {
+                client = document.getElementById("customValueInput").value;
+            }
+            else
+            {
+                client = document.getElementById('clienttext').value;
+            }
+
+            let type = "";
+            if (comboBox2Select.value === "other") {
+                type = document.getElementById("customValueInput2").value;
+            }
+            else
+            {
+                type = document.getElementById('comboBox2').value;
+            }
+            const amount = document.getElementById('textBox1').value;
+            const date = document.getElementById('datePicker').value;
+
+            hash(`${date}${client}${type}${id}${Math.floor(Math.random() * (9999 - 0 + 1)) + 0}`).then(result =>
+            {
+                const newEntry = document.createElement('button');
+                newEntry.classList.add('btn');
+                newEntry.id = `${result} ${date} ${client} ${type} ${amount}`;
+                newEntry.innerText = `${date} ${type} ${amount}`;
+
+                const lineBreak = document.createElement('br');
+
+                newEntry.addEventListener('click', function () {
+                    newEntry.remove();
+                    lineBreak.remove();
+                });
+
+                const flowLayoutPanel = document.getElementById('flowLayoutPanel1');
+                const firstChild = flowLayoutPanel.firstChild; // Get the first child of the container
+
+                if (firstChild) {
+                    flowLayoutPanel.insertBefore(newEntry, firstChild); // Insert the new button before the first child
+                    flowLayoutPanel.insertBefore(lineBreak, firstChild); // Insert the line break before the first child
+                } else {
+                    flowLayoutPanel.appendChild(newEntry); // If there are no children, simply append the new button
+                    flowLayoutPanel.appendChild(lineBreak); // Also append the line break
+                }
+
+                document.getElementById('textBox1').value = '';
+            });
+
+            id++;
+            const input = document.getElementById("textBox1");
+            input.focus();
+        });
+
+		document.getElementById('button3').addEventListener('click', () =>
+        {
+            // Get the div element by its id
+            const flowLayoutPanel = document.getElementById('flowLayoutPanel1');
+
+            // Select all buttons within the div
+            const buttons = flowLayoutPanel.querySelectorAll('.btn');
+
+            if (buttons.length == 0) {
+                alert("Nie podano zadnych wartosci.");
+                return;
+            }
+
+            // Initialize an array to store the JSON objects
+            const jsonArray = [];
+
+            // Loop through each button and extract the required information
+            buttons.forEach(button => {
+
+                const [id, date, client, type, amount] = button.id.split(' ');
+
+
+                const amountNumber = parseFloat(amount.replace(',', '.'));
+
+                // Create the JSON object
+                const jsonObject = {
+                    id,
+                    date: new Date(date).toISOString(),
+                    client,
+                    type,
+                    amount: amountNumber,
+                    settled: 0,
+                    added_date: getCurrentDateTime()
+                };
+
+                // Add the JSON object to the array
+                jsonArray.push(jsonObject);
+            });
+
+            // Convert the array to a JSON string
+            const jsonText = JSON.stringify(jsonArray, null, 2);
+
+            // Log the JSON text
+            console.log(jsonText);
+
+            sendDataToServer(jsonText);
+            //location.reload()
+        });
+
+        function getCurrentDateTime() {
+            const now = new Date();
+
+            const dd = String(now.getDate()).padStart(2, '0');
+            const MM = String(now.getMonth() + 1).padStart(2, '0'); // January is 0!
+            const yyyy = now.getFullYear();
+
+            const HH = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+
+            return `${dd}-${MM}-${yyyy} ${HH}:${mm}:${ss}`;
+        }
+
+        function sendDataToServer(json) {
+            fetch('/api/addNewOrders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: json
+            });
+        }
+
+        async function hash(input) {
+
+            const encoder = new TextEncoder();
+            const data = encoder.encode(input);
+
+            const buffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(buffer));
+
+            const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+            return hashHex;
+        }
+
+    </script>
+</body>
+</html>

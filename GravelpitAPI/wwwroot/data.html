@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Data Viewer</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  .sidebar {
+    width: 100%;
+    background-color: #f4f4f4;
+    padding: 10px;
+    overflow-y: auto;
+    border-bottom: 1px solid #ccc;
+  }
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    overflow-x: auto;
+  }
+  .sidebar li {
+    padding: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sidebar li:hover {
+    background-color: #ddd;
+  }
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .client-name {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .date-range {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .date-range label, .date-range input, .date-range button {
+    margin: 2px;
+  }
+  .values {
+    display: flex;
+    overflow-x: auto;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .value-box {
+    min-width: 80px;
+    padding: 10px;
+    margin-right: 10px;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+  .sum {
+    font-size: 18px;
+  }
+
+  @media (min-width: 600px) {
+    body {
+      flex-direction: row;
+    }
+    .sidebar {
+      width: 200px;
+      border-right: 1px solid #ccc;
+      border-bottom: none;
+    }
+    .sidebar ul {
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    .content {
+      padding: 20px;
+    }
+    .client-name {
+      font-size: 24px;
+    }
+    .date-range {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .values {
+      width: 80%;
+    }
+    .value-box {
+      min-width: 100px;
+      padding: 20px;
+    }
+    .sum {
+      font-size: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <ul>
+    <!-- List of clients will be populated here -->
+  </ul>
+</div>
+<div class="content">
+  <div class="client-name">Client: <span id="clientName">Select a client</span></div>
+  <div class="date-range">
+    <label for="startDate">From: </label>
+    <input type="date" id="startDate" style="width: 75%;">
+    <label for="endDate">To: </label>
+    <input type="date" id="endDate" style="width: 75%;">
+</div>
+<button onclick="filterByDate()">Filter</button>
+  <div class="values">
+    <!-- Values will be populated here -->
+  </div>
+  <div class="sum">Sum: <span id="sum">0</span></div>
+</div>
+<script>
+// Example data
+const clients = [
+  { name: 'Client 1', values: [{ date: '2024-05-01', value: 10 }, { date: '2024-05-02', value: 20 }, { date: '2024-05-03', value: 30 }] },
+  { name: 'Client 2', values: [{ date: '2024-05-01', value: 5 }, { date: '2024-05-02', value: 15 }, { date: '2024-05-03', value: 25 }] },
+  // Add more clients as needed
+];
+
+// Populate the client list
+const clientList = document.querySelector('.sidebar ul');
+clients.forEach((client, index) => {
+  const listItem = document.createElement('li');
+  listItem.textContent = client.name;
+  listItem.onclick = () => displayClientData(index);
+  clientList.appendChild(listItem);
+});
+
+let selectedClientIndex = -1;
+
+function displayClientData(index) {
+  selectedClientIndex = index;
+  const client = clients[index];
+  document.getElementById('clientName').textContent = client.name;
+
+  const valuesContainer = document.querySelector('.values');
+  valuesContainer.innerHTML = '';
+  let sum = 0;
+
+  client.values.forEach(item => {
+    const valueBox = document.createElement('div');
+    valueBox.className = 'value-box';
+    valueBox.textContent = `${item.date}: ${item.value}`;
+    valuesContainer.appendChild(valueBox);
+    sum += item.value;
+  });
+
+  document.getElementById('sum').textContent = sum;
+}
+
+function filterByDate() {
+  if (selectedClientIndex === -1) return;
+
+  const client = clients[selectedClientIndex];
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  const valuesContainer = document.querySelector('.values');
+  valuesContainer.innerHTML = '';
+  let sum = 0;
+
+  client.values.forEach(item => {
+    if (item.date >= startDate && item.date <= endDate) {
+      const valueBox = document.createElement('div');
+      valueBox.className = 'value-box';
+      valueBox.textContent = `${item.date}: ${item.value}`;
+      valuesContainer.appendChild(valueBox);
+      sum += item.value;
+    }
+  });
+
+  document.getElementById('sum').textContent = sum;
+}
+</script>
+</body>
+</html>
